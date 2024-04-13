@@ -1,1 +1,4 @@
 scraping-gmaps/node_modules
+golang/todo-service
+golang/todo-services/.env
+golang/todo-services/tmp
