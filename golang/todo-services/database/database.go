@@ -40,7 +40,7 @@ func DatabaseInit(cfg config.Config){
 	log.Println("connected")
 	db.Logger = logger.Default.LogMode(logger.Info)
 
-	db.AutoMigrate(&models.Todo{})
+	db.AutoMigrate(&models.Todo{}, &models.User{})
 
 	DB = DBInstance{
 		DB: db,

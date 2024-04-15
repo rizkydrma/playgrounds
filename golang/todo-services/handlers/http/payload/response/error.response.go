@@ -10,6 +10,7 @@ const (
 	SUCCESS_CODE 										= "200"
 	ERROR_CODE											= "500"
 	NOT_FOUND_CODE									= "404"
+	EMAIL_ALREADY_EXIST_CODE				= "402"
 
 	INTERNAL_SERVER_ERROR_CODE			= "500"
 	INVALID_REQUEST_PAYLOAD_CODE		= "400"
@@ -24,6 +25,7 @@ const (
 	SUCCESS_MESSAGE									= "Success"
 	ERROR_MESSAGE										= "Error"
 	NOT_FOUND_MESSAGE								= "Not Found"
+	EMAIL_ALREADY_EXIST_MESSAGE			= "Email already exist"
 
 	INTERNAL_SERVER_ERROR_MESSAGE		= "Internal server error"
 	INVALID_REQUEST_PAYLOAD_MESSAGE	= "Invalid request payload"
