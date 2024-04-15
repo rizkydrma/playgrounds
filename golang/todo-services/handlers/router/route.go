@@ -1,6 +1,7 @@
 package router
 
 import (
+	"todo-services/config"
 	"todo-services/handlers/http/controllers"
 
 	"github.com/gofiber/fiber/v2"
@@ -29,6 +30,8 @@ func RouteInit() *fiber.App {
 	api.Delete("/todo/:id", controllers.TodoDeleteById)
 	
 
+	// STATIC ASSET
+	app.Static("/public", config.ProjectRootPath + "/public/asset")
 
 	return app
 }

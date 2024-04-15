@@ -1,6 +1,10 @@
 package config
 
-import "os"
+import (
+	"os"
+	"path/filepath"
+	"runtime"
+)
 
 type Config struct {
 	DBUser 			string
@@ -20,3 +24,9 @@ func LoadConfig() Config {
 	}
 }
 
+var (
+	// Get current file full path from runtime
+	_, b, _, _ = runtime.Caller(0)
+	// Define Root folder of this project
+	ProjectRootPath = filepath.Join(filepath.Dir(b), "../")
+)
