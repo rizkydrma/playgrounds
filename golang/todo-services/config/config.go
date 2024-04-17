@@ -7,20 +7,23 @@ import (
 )
 
 type Config struct {
-	DBUser 			string
-	DBPassword	string
-	DBName			string
-	DBPort			string
-	DBHost			string
+	DBUser 					string
+	DBPassword			string
+	DBName					string
+	DBPort					string
+	DBHost					string
+	SECRETE_TOKEN		string
 }
 
 func LoadConfig() Config {
 	return Config{
-		DBUser: 			os.Getenv("DB_USER"),
-		DBPassword: 	os.Getenv("DB_PASSWORD"),
-		DBName: 			os.Getenv("DB_NAME"),
-		DBPort:	 			os.Getenv("DB_PORT"),
-		DBHost: 			os.Getenv("DB_HOST"),
+		DBUser: 				os.Getenv("DB_USER"),
+		DBPassword: 		os.Getenv("DB_PASSWORD"),
+		DBName: 				os.Getenv("DB_NAME"),
+		DBPort:	 				os.Getenv("DB_PORT"),
+		DBHost: 				os.Getenv("DB_HOST"),
+
+		SECRETE_TOKEN: 	os.Getenv("SERCRET_TOKEN"),
 	}
 }
 

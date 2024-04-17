@@ -3,6 +3,7 @@ package router
 import (
 	"todo-services/config"
 	"todo-services/handlers/http/controllers"
+	"todo-services/middleware"
 
 	"github.com/gofiber/fiber/v2"
 )
@@ -13,8 +14,11 @@ func RouteInit() *fiber.App {
 	
 	api := app.Group("/api")
 
+	// AUTH
+	api.Post("/login", controllers.Login)
+
 	// USER
-	api.Get("/users", controllers.UserGetAll)
+	api.Get("/users", middleware.AuthMiddleware ,controllers.UserGetAll)
 	api.Get("/user/:id", controllers.UserGetById)
 	api.Post("/user/register", controllers.UserCreate)
 	api.Patch("/user/:id", controllers.UserUpdateById)
