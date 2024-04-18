@@ -16,22 +16,22 @@ func RouteInit() *fiber.App {
 
 	// AUTH
 	api.Post("/login", controllers.Login)
+	api.Post("/register", controllers.UserCreate)
 
 	// USER
 	api.Get("/users", middleware.AuthMiddleware ,controllers.UserGetAll)
-	api.Get("/user/:id", controllers.UserGetById)
-	api.Post("/user/register", controllers.UserCreate)
-	api.Patch("/user/:id", controllers.UserUpdateById)
-	api.Patch("/user/:id/change-email", controllers.UserUpdateEmail)
-	api.Delete("/user/:id", controllers.UserDelete)
+	api.Get("/user/:id", middleware.AuthMiddleware,controllers.UserGetById)
+	api.Patch("/user/:id", middleware.AuthMiddleware,controllers.UserUpdateById)
+	api.Patch("/user/:id/change-email", middleware.AuthMiddleware, controllers.UserUpdateEmail)
+	api.Delete("/user/:id", middleware.AuthMiddleware, controllers.UserDelete)
 
 	// TODO
-	api.Get("/todos", controllers.TodoGetAll)
-	api.Get("/todo/:id", controllers.TodoGetById)
-	api.Post("/todo", controllers.TodoCreate)
-	api.Patch("/todo/:id", controllers.TodoUpdateById)
-	api.Patch("/todo/:id/change-status", controllers.TodoToggleStatusById)
-	api.Delete("/todo/:id", controllers.TodoDeleteById)
+	api.Get("/todos", middleware.AuthMiddleware,controllers.TodoGetAll)
+	api.Get("/todo/:id", middleware.AuthMiddleware,controllers.TodoGetById)
+	api.Post("/todo", middleware.AuthMiddleware,controllers.TodoCreate)
+	api.Patch("/todo/:id", middleware.AuthMiddleware,controllers.TodoUpdateById)
+	api.Patch("/todo/:id/change-status", middleware.AuthMiddleware, controllers.TodoToggleStatusById)
+	api.Delete("/todo/:id", middleware.AuthMiddleware, controllers.TodoDeleteById)
 	
 
 	// STATIC ASSET

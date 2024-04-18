@@ -13,9 +13,16 @@ import (
 func TodoGetAll(ctx *fiber.Ctx) error {
 	var todos []models.Todo
 
-	err := database.DB.DB.Find(&todos, "deleted_at = 0").Error
-
-	if err != nil {
+	// GET USER ID
+	userId, errToken := lib.GetUserIdFromToken(ctx)
+	if errToken != nil {
+		return ctx.Status(fiber.StatusUnauthorized).JSON(response.BaseResponse{
+				Message: errToken.Error(),
+				Code: response.UNAUTHORIZED_CODE,
+		})
+	}
+	
+	if err := database.DB.DB.Find(&todos, "user_id = ? AND deleted_at = 0", userId).Error; err != nil {
 		ctx.Status(fiber.StatusInternalServerError).JSON(response.BaseResponse{
 			Message: response.FAILED_GET_DATA_MESSAGE,
 			Code: response.FAILED_GET_DATA_CODE,
@@ -30,10 +37,19 @@ func TodoGetAll(ctx *fiber.Ctx) error {
 }
 
 func TodoGetById(ctx *fiber.Ctx) error {
+	var todo models.Todo
 	todoId := ctx.Params("id")
 
-	var todo models.Todo
-	err := database.DB.DB.First(&todo, "id = ? AND deleted_at = 0", todoId).Error
+	// GET USER ID
+	userId, errToken := lib.GetUserIdFromToken(ctx)
+	if errToken != nil {
+		return ctx.Status(fiber.StatusUnauthorized).JSON(response.BaseResponse{
+				Message: errToken.Error(),
+				Code: response.UNAUTHORIZED_CODE,
+		})
+	}
+
+	err := database.DB.DB.First(&todo, "id = ? AND user_id = ? AND deleted_at = 0", todoId, userId).Error
 
 	if err != nil {
 		return ctx.Status(fiber.StatusNotFound).JSON(response.BaseResponse{
@@ -48,7 +64,6 @@ func TodoGetById(ctx *fiber.Ctx) error {
 			Code: response.SUCCESS_CODE,
 			Data: todo,
 		})
-
 }
 
 func TodoCreate(ctx *fiber.Ctx) error {
@@ -58,6 +73,15 @@ func TodoCreate(ctx *fiber.Ctx) error {
 		return ctx.Status(fiber.StatusBadRequest).JSON(response.BaseResponse{
 			Message: response.INVALID_REQUEST_PAYLOAD_MESSAGE,
 			Code: response.INVALID_REQUEST_PAYLOAD_CODE,
+		})
+	}
+
+	// GET USER ID
+	userId, errToken := lib.GetUserIdFromToken(ctx)
+	if errToken != nil {
+		return ctx.Status(fiber.StatusUnauthorized).JSON(response.BaseResponse{
+				Message: errToken.Error(),
+				Code: response.UNAUTHORIZED_CODE,
 		})
 	}
 
@@ -73,6 +97,7 @@ func TodoCreate(ctx *fiber.Ctx) error {
 	newTodo := models.Todo{
 		Title: todo.Title,
 		Description: todo.Description,
+		UserId: userId,
 	}
 
 	err := database.DB.DB.Create(&newTodo).Error; if err != nil {
@@ -92,6 +117,15 @@ func TodoCreate(ctx *fiber.Ctx) error {
 
 func TodoUpdateById(ctx *fiber.Ctx) error {
 	todoRequest := new(request.TodoUpdateRequest)
+
+	// GET USER ID
+	userId, errToken := lib.GetUserIdFromToken(ctx)
+	if errToken != nil {
+		return ctx.Status(fiber.StatusUnauthorized).JSON(response.BaseResponse{
+				Message: errToken.Error(),
+				Code: response.UNAUTHORIZED_CODE,
+		})
+	}
 	
 	if err := ctx.BodyParser(todoRequest); err != nil {
 		return ctx.Status(fiber.StatusBadRequest).JSON(response.BaseResponse{
@@ -112,7 +146,7 @@ func TodoUpdateById(ctx *fiber.Ctx) error {
 
 	// CHECK IF TODO EXIST
 	var todo models.Todo
-	if err := database.DB.DB.First(&todo, "id = ? AND deleted_at = 0", todoId).Error; err != nil {
+	if err := database.DB.DB.First(&todo, "id = ? AND user_id = ? AND deleted_at = 0", todoId, userId).Error; err != nil {
 		return ctx.Status(fiber.StatusNotFound).JSON(response.BaseResponse{
 			Message: response.NOT_FOUND_MESSAGE,
 			Code: response.NOT_FOUND_CODE,
@@ -140,6 +174,15 @@ func TodoUpdateById(ctx *fiber.Ctx) error {
 func TodoToggleStatusById(ctx *fiber.Ctx) error {
 	todoRequest := new(request.TodoToggleRequest)
 
+	// GET USER ID
+	userId, errToken := lib.GetUserIdFromToken(ctx)
+	if errToken != nil {
+		return ctx.Status(fiber.StatusUnauthorized).JSON(response.BaseResponse{
+				Message: errToken.Error(),
+				Code: response.UNAUTHORIZED_CODE,
+		})
+	}
+
 	if err := ctx.BodyParser(todoRequest); err != nil {
 		return ctx.Status(fiber.StatusBadRequest).JSON(response.BaseResponse{
 			Message: response.INVALID_REQUEST_PAYLOAD_MESSAGE,
@@ -158,7 +201,7 @@ func TodoToggleStatusById(ctx *fiber.Ctx) error {
 	todoId := ctx.Params("id")
 	// CHECK IF TODO EXIST
 	var todo models.Todo
-	if err := database.DB.DB.First(&todo, "id = ? AND deleted_at = 0", todoId).Error; err != nil {
+	if err := database.DB.DB.First(&todo, "id = ? AND user_id = ? AND deleted_at = 0", todoId, userId).Error; err != nil {
 		return ctx.Status(fiber.StatusNotFound).JSON(response.BaseResponse{
 			Message: response.NOT_FOUND_MESSAGE,
 			Code: response.NOT_FOUND_CODE,
@@ -184,7 +227,16 @@ func TodoDeleteById(ctx *fiber.Ctx) error {
 	todoId := ctx.Params("id")
 	var todo models.Todo
 
-	if err := database.DB.DB.First(&todo, "id = ? AND deleted_at = 0", todoId).Error; err != nil {
+	// GET USER ID
+	userId, errToken := lib.GetUserIdFromToken(ctx)
+	if errToken != nil {
+		return ctx.Status(fiber.StatusUnauthorized).JSON(response.BaseResponse{
+				Message: errToken.Error(),
+				Code: response.UNAUTHORIZED_CODE,
+		})
+	}
+
+	if err := database.DB.DB.First(&todo, "id = ? AND user_id = ? AND deleted_at = 0", todoId, userId).Error; err != nil {
 		return ctx.Status(fiber.StatusNotFound).JSON(response.BaseResponse{
 			Message: response.NOT_FOUND_MESSAGE,
 			Code: response.NOT_FOUND_CODE,
