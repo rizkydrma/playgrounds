@@ -15,23 +15,26 @@ func RouteInit() *fiber.App {
 	api := app.Group("/api")
 
 	// AUTH
-	api.Post("/login", controllers.Login)
-	api.Post("/register", controllers.UserCreate)
+	authController := controllers.NewAuthController()
+	api.Post("/login", authController.Login)
+	api.Post("/register", authController.Register)
 
 	// USER
-	api.Get("/users", middleware.AuthMiddleware ,controllers.UserGetAll)
-	api.Get("/user/:id", middleware.AuthMiddleware,controllers.UserGetById)
-	api.Patch("/user/:id", middleware.AuthMiddleware,controllers.UserUpdateById)
-	api.Patch("/user/:id/change-email", middleware.AuthMiddleware, controllers.UserUpdateEmail)
-	api.Delete("/user/:id", middleware.AuthMiddleware, controllers.UserDelete)
+	userController := controllers.NewUserController()
+	api.Get("/users", middleware.AuthMiddleware ,userController.GetAll)
+	api.Get("/user/:id", middleware.AuthMiddleware,userController.GetById)
+	api.Patch("/user/:id", middleware.AuthMiddleware,userController.UpdateById)
+	api.Patch("/user/:id/change-email", middleware.AuthMiddleware, userController.UpdateEmail)
+	api.Delete("/user/:id", middleware.AuthMiddleware, userController.Delete)
 
 	// TODO
-	api.Get("/todos", middleware.AuthMiddleware,controllers.TodoGetAll)
-	api.Get("/todo/:id", middleware.AuthMiddleware,controllers.TodoGetById)
-	api.Post("/todo", middleware.AuthMiddleware,controllers.TodoCreate)
-	api.Patch("/todo/:id", middleware.AuthMiddleware,controllers.TodoUpdateById)
-	api.Patch("/todo/:id/change-status", middleware.AuthMiddleware, controllers.TodoToggleStatusById)
-	api.Delete("/todo/:id", middleware.AuthMiddleware, controllers.TodoDeleteById)
+	todoController := controllers.NewTodoController()
+	api.Get("/todos", middleware.AuthMiddleware, todoController.GetAll)
+	api.Get("/todo/:id", middleware.AuthMiddleware, todoController.GetById)
+	api.Post("/todo", middleware.AuthMiddleware, todoController.Create)
+	api.Patch("/todo/:id", middleware.AuthMiddleware, todoController.UpdateById)
+	api.Patch("/todo/:id/change-status", middleware.AuthMiddleware, todoController.ToggleStatusById)
+	api.Delete("/todo/:id", middleware.AuthMiddleware, todoController.DeleteById)
 	
 
 	// STATIC ASSET

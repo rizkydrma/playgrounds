@@ -10,7 +10,13 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-func TodoGetAll(ctx *fiber.Ctx) error {
+type TodoController struct {}
+
+func NewTodoController() TodoController {
+	return TodoController{}
+}
+
+func (c *TodoController) GetAll(ctx *fiber.Ctx) error {
 	var todos []models.Todo
 
 	// GET USER ID
@@ -23,7 +29,7 @@ func TodoGetAll(ctx *fiber.Ctx) error {
 	}
 	
 	if err := database.DB.DB.Find(&todos, "user_id = ? AND deleted_at = 0", userId).Error; err != nil {
-		ctx.Status(fiber.StatusInternalServerError).JSON(response.BaseResponse{
+		return ctx.Status(fiber.StatusInternalServerError).JSON(response.BaseResponse{
 			Message: response.FAILED_GET_DATA_MESSAGE,
 			Code: response.FAILED_GET_DATA_CODE,
 		})
@@ -36,7 +42,7 @@ func TodoGetAll(ctx *fiber.Ctx) error {
 	})
 }
 
-func TodoGetById(ctx *fiber.Ctx) error {
+func (c *TodoController) GetById(ctx *fiber.Ctx) error {
 	var todo models.Todo
 	todoId := ctx.Params("id")
 
@@ -66,7 +72,7 @@ func TodoGetById(ctx *fiber.Ctx) error {
 		})
 }
 
-func TodoCreate(ctx *fiber.Ctx) error {
+func (c * TodoController) Create(ctx *fiber.Ctx) error {
 	todo := new(request.TodoRequest)
 	
 	if err := ctx.BodyParser(todo); err != nil {
@@ -115,7 +121,7 @@ func TodoCreate(ctx *fiber.Ctx) error {
 	})
 }
 
-func TodoUpdateById(ctx *fiber.Ctx) error {
+func (c *TodoController) UpdateById(ctx *fiber.Ctx) error {
 	todoRequest := new(request.TodoUpdateRequest)
 
 	// GET USER ID
@@ -171,7 +177,7 @@ func TodoUpdateById(ctx *fiber.Ctx) error {
 	})
 }
 
-func TodoToggleStatusById(ctx *fiber.Ctx) error {
+func (c *TodoController) ToggleStatusById(ctx *fiber.Ctx) error {
 	todoRequest := new(request.TodoToggleRequest)
 
 	// GET USER ID
@@ -223,7 +229,7 @@ func TodoToggleStatusById(ctx *fiber.Ctx) error {
 	})
 }
 
-func TodoDeleteById(ctx *fiber.Ctx) error {
+func (c *TodoController) DeleteById(ctx *fiber.Ctx) error {
 	todoId := ctx.Params("id")
 	var todo models.Todo
 
