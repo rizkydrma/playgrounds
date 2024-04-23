@@ -4,6 +4,7 @@ import (
 	"todo-services/config"
 	"todo-services/handlers/http/controllers"
 	"todo-services/middleware"
+	"todo-services/services"
 
 	"github.com/gofiber/fiber/v2"
 )
@@ -28,7 +29,8 @@ func RouteInit() *fiber.App {
 	api.Delete("/user/:id", middleware.AuthMiddleware, userController.Delete)
 
 	// TODO
-	todoController := controllers.NewTodoController()
+	todoService := services.NewTodoService()
+	todoController := controllers.NewTodoController(&todoService)
 	api.Get("/todos", middleware.AuthMiddleware, todoController.GetAll)
 	api.Get("/todo/:id", middleware.AuthMiddleware, todoController.GetById)
 	api.Post("/todo", middleware.AuthMiddleware, todoController.Create)
