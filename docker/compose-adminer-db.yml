@@ -1,0 +1,50 @@
+version: "3.8"
+
+networks:
+  app-network:
+    driver: bridge
+
+services:
+  postgres:
+    image: postgres:16
+    container_name: postgres
+    restart: always
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: postgres
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - app-network
+
+  # mysql:
+  #   image: mysql:8
+  #   container_name: mysql
+  #   restart: always
+  #   environment:
+  #     MYSQL_ROOT_PASSWORD: root
+  #   volumes:
+  #     - mysql_data:/var/lib/mysql
+  #   ports:
+  #     - "3306:3306"
+  #   networks:
+  #     - app-network
+
+  adminer:
+    image: adminer:latest
+    container_name: adminer
+    restart: always
+    # environment:
+    #   MEMORY: 512M
+    #   UPLOAD: 4096M
+    ports:
+      - "8002:8080"
+    networks:
+      - app-network
+
+volumes:
+  postgres_data:
+  mysql_data:

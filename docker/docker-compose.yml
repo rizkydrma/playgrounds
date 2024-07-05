@@ -1,0 +1,73 @@
+version: '3.8'
+x-postgres-common:
+  &postgres-common
+  image: postgres:16
+  user: postgres
+  restart: always
+  healthcheck:
+    test: 'pg_isready -U postgres --dbname=postgres'
+    interval: 10s
+    timeout: 5s
+    retries: 5
+
+x-mysql-common:
+  &mysql-common
+  image: mysql:8.0 
+  restart: always
+
+services:
+  mysql:
+    <<: *mysql-common
+    container_name: mysql
+    command: mysqld --sql_mode="traditional" --default-authentication-plugin=mysql_native_password --log_bin_trust_function_creators=1
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+    ports:
+     - 3306:3306
+    volumes: 
+         - mysql-volume:/var/lib/mysql
+    networks:
+      - local_network
+
+  postgres_master:
+    <<: *postgres-common
+    container_name: postgres_master
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_DB: postgres
+      POSTGRES_PASSWORD: root
+      POSTGRES_HOST_AUTH_METHOD: "scram-sha-256\nhost replication all 0.0.0.0/0 md5"
+      POSTGRES_INITDB_ARGS: "--auth-host=scram-sha-256"
+    command: |
+      postgres 
+      -c wal_level=replica 
+      -c hot_standby=on 
+      -c max_wal_senders=10 
+      -c max_replication_slots=10 
+      -c hot_standby_feedback=on
+    volumes:
+      - postgres-volume:/var/lib/postgresql/data
+
+    networks:
+      - local_network
+
+  adminer:
+    image: adminer
+    container_name: adminer
+    restart: always
+    ports:
+      - 8002:8080
+    networks:
+      - local_network
+
+networks:
+  local_network:
+    external: true
+
+volumes:
+  postgres-volume: {}
+  mysql-volume: {}
+
+
